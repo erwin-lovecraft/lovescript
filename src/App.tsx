@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 type Command = {
   type: string;
@@ -19,6 +19,7 @@ export default function Terminal() {
   const [confettiActive, setConfettiActive] = useState(false);
   const [confetti, setConfetti] = useState<Confetti[]>([]);
   const [showInitial, setShowInitial] = useState(true);
+  const terminalRef = useRef<HTMLDivElement>(null);
 
   const wishes = [
     "Em là thứ tuyệt vời nhất trong đời anh 💕",
@@ -94,6 +95,13 @@ export default function Terminal() {
       }, 500);
     }
   }, [showInitial]);
+
+  // Auto-scroll to bottom when output changes
+  useEffect(() => {
+    if (terminalRef.current) {
+      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+    }
+  }, [output]);
 
   const generateConfetti = () => {
     const newConfetti = Array.from({ length: 30 }).map(() => ({
@@ -196,7 +204,10 @@ export default function Terminal() {
         </div>
 
         {/* Terminal Content */}
-        <div className="flex-1 overflow-y-auto p-4 font-mono text-sm">
+        <div
+          ref={terminalRef}
+          className="flex-1 overflow-y-auto p-4 font-mono text-sm"
+        >
           {output.map((line, idx) => (
             <div
               key={idx}
